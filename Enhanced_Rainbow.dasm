@@ -1,0 +1,43 @@
+	processor 6502
+	include "vcs.h"
+	include "macro.h"
+
+	org  $f000
+
+DIV equ #3
+
+Start:	
+	CLEAN_START
+
+NextFrame:
+	VERTICAL_SYNC
+        
+        ldx #36
+LVBlank:
+	sta WSYNC
+	dex
+	bne LVBlank
+        stx VBLANK
+
+	ldx #192/DIV        
+ScanLoop:
+	repeat DIV
+        	sta WSYNC 
+	repend
+	stx COLUBK
+	dex
+	bne ScanLoop
+	lda #2
+        sta VBLANK
+
+	ldx #30
+LVOver:
+	sta WSYNC
+	dex
+	bne LVOver
+
+	jmp NextFrame
+	
+	org $fffc
+	.word Start
+	.word Start
